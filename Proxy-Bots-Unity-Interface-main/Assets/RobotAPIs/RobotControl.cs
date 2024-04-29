@@ -13,8 +13,6 @@ public class RobotControl : MonoBehaviour
     public int testSpeed=100;
     public bool enableKeystrokeTest;
 
-
-  
     void Update()
     {
         if (enableKeystrokeTest)
@@ -61,8 +59,13 @@ public class RobotControl : MonoBehaviour
         }
     }
 
-    public void RobotMove(int mode, int speed)  // Mode: 1 forward, 2 revers, 3 left, 4 right.  Speed 0-255, 20 seems to be about the slowest.
+    public void RobotMove(int mode, int speed, string name = null)  // Mode: 1 forward, 2 revers, 3 left, 4 right.  Speed 0-255, 20 seems to be about the slowest.
     {
+        if (name != null)
+        {
+            robotName = name;
+        }
+
         var message = new OSCMessage(robotName);
         message.AddValue(OSCValue.Int(mode));
         message.AddValue(OSCValue.Int(speed));                                              

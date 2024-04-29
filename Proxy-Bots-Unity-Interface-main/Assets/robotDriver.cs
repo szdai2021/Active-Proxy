@@ -13,10 +13,18 @@ public class robotDriver : MonoBehaviour
     public TextMeshPro t;
 
     public bool stopRobot = false;
+    public bool hasPath = false;
+
+    private Vector3 prevDestination;
 
     // Update is called once per frame
     void Update()
     {
+        if (prevDestination != destination.transform.position)
+        {
+            hasPath = false;
+        }
+
         if (stopRobot)
         {
             this.GetComponent<NavMeshAgent>().speed = 0;
@@ -30,27 +38,50 @@ public class robotDriver : MonoBehaviour
             this.GetComponent<NavMeshAgent>().acceleration = 0.3f;
         }
 
+        if (!hasPath)
+        {
+            findPath();
+        }
+        else
+        {
+            drawPath();
+
+            string s = "";
+
+            foreach (Vector3 a in this.GetComponent<NavMeshAgent>().path.corners)
+            {
+                s += a.ToString() + " ";
+            }
+
+            t.text = s;
+        }
+
+        robotClone.transform.position = this.transform.position;
+        prevDestination = destination.transform.position;
+    }
+
+    public void findPath()
+    {
         surface.BuildNavMesh();
         this.GetComponent<NavMeshAgent>().SetDestination(destination.transform.position);
 
-        robotClone.transform.position = this.transform.position;
-
-        NavMeshPath path = null;
-        this.GetComponent<NavMeshAgent>().CalculatePath(destination.transform.position, path);
-
-        DrawPath(path);
+        hasPath = this.GetComponent<NavMeshAgent>().hasPath;
     }
 
-    void DrawPath(NavMeshPath path)
+    private void drawPath()
     {
+        this.GetComponent<LineRenderer>().positionCount = this.GetComponent<NavMeshAgent>().path.corners.Length;
 
-        print(path.corners.Length);
+        this.GetComponent<LineRenderer>().SetPosition(0, this.transform.position);
 
-        this.GetComponent<LineRenderer>().positionCount = path.corners.Length; //set the array of positions to the amount of corners
-
-        for (int i = 1; i < path.corners.Length; i++)
+        if (this.GetComponent<NavMeshAgent>().path.corners.Length < 2)
         {
-            this.GetComponent<LineRenderer>().SetPosition(i, path.corners[i]); //go through each corner and set that to the line renderer's position
+            return;
+        }
+
+        for (int i = 1; i < this.GetComponent<NavMeshAgent>().path.corners.Length; i++)
+        {
+            this.GetComponent<LineRenderer>().SetPosition(i, this.GetComponent<NavMeshAgent>().path.corners[i]);
         }
     }
 }
