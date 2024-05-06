@@ -8,9 +8,10 @@ public class robotDriver : MonoBehaviour
 {
     public GameObject destination;
     public NavMeshSurface surface;
-    public GameObject robotClone;
 
     public TextMeshPro t;
+
+    public executePath executePath;
 
     public bool stopRobot = false;
     public bool hasPath = false;
@@ -23,6 +24,13 @@ public class robotDriver : MonoBehaviour
         if (prevDestination != destination.transform.position)
         {
             hasPath = false;
+
+            string name = this.gameObject.name;
+            int i = int.Parse(name[name.Length-1].ToString());
+
+            print(i);
+
+            executePath.destinationFinished[i-1] = false;
         }
 
         if (stopRobot)
@@ -56,7 +64,6 @@ public class robotDriver : MonoBehaviour
             t.text = s;
         }
 
-        robotClone.transform.position = this.transform.position;
         prevDestination = destination.transform.position;
     }
 

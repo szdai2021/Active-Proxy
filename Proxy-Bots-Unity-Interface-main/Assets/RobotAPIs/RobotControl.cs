@@ -10,7 +10,8 @@ public class RobotControl : MonoBehaviour
 
     public OSCTransmitter transmitter;
     public string robotName = "/Robot1";
-    public int testSpeed=100;
+    public int testSpeedL=100;
+    public int testSpeedR = 100;
     public bool enableKeystrokeTest;
 
     void Update()
@@ -19,7 +20,7 @@ public class RobotControl : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.W))
             {
-                RobotMove(1, testSpeed);               
+                RobotMove(3, testSpeedL, testSpeedR);               
 
             }
             if (Input.GetKeyUp(KeyCode.W))
@@ -29,7 +30,7 @@ public class RobotControl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.S))
             {
-                RobotMove(2, testSpeed);
+                RobotMove(4, testSpeedL, testSpeedR);
 
             }
             if (Input.GetKeyUp(KeyCode.S))
@@ -39,7 +40,7 @@ public class RobotControl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.A))
             {
-                RobotMove(3, testSpeed);
+                RobotMove(1, testSpeedL, testSpeedR);
 
             }
             if (Input.GetKeyUp(KeyCode.A))
@@ -49,7 +50,7 @@ public class RobotControl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.D))
             {
-                RobotMove(4, testSpeed);
+                RobotMove(2, testSpeedL, testSpeedR);
 
             }
             if (Input.GetKeyUp(KeyCode.D))
@@ -59,7 +60,7 @@ public class RobotControl : MonoBehaviour
         }
     }
 
-    public void RobotMove(int mode, int speed, string name = null)  // Mode: 1 forward, 2 revers, 3 left, 4 right.  Speed 0-255, 20 seems to be about the slowest.
+    public void RobotMove(int mode, int speedL, int speedR, string name = null)  // Mode: 1 left, 2 right, 3 forward, 4 revers.  Speed 0-255, 20 seems to be about the slowest.
     {
         if (name != null)
         {
@@ -68,31 +69,35 @@ public class RobotControl : MonoBehaviour
 
         var message = new OSCMessage(robotName);
         message.AddValue(OSCValue.Int(mode));
-        message.AddValue(OSCValue.Int(speed));                                              
+        message.AddValue(OSCValue.Int(speedL)); 
+        message.AddValue(OSCValue.Int(speedR));
         transmitter.Send(message);
     }
 
-    public void Move(int speed)
+    public void Move(int speedL, int speedR)
     {       
         var message = new OSCMessage(robotName);
         message.AddValue(OSCValue.Int(1));
-        message.AddValue(OSCValue.Int(speed));
+        message.AddValue(OSCValue.Int(speedL));
+        message.AddValue(OSCValue.Int(speedR));
         transmitter.Send(message);
     }
 
-    public void Rotate(int speed)
+    public void Rotate(int speedL, int speedR)
     {
         var message = new OSCMessage(robotName);
         message.AddValue(OSCValue.Int(4));
-        message.AddValue(OSCValue.Int(speed));
+        message.AddValue(OSCValue.Int(speedL));
+        message.AddValue(OSCValue.Int(speedR));
         transmitter.Send(message);
     }
 
-    public void Stop()
+    public void Stop(string name = null)
     {
-        var message = new OSCMessage(robotName);
+        var message = new OSCMessage(name);
         message.AddValue(OSCValue.Int(0)); 
-        message.AddValue(OSCValue.Int(0));                                  
+        message.AddValue(OSCValue.Int(0));
+        message.AddValue(OSCValue.Int(0));
         transmitter.Send(message);
     }
 }

@@ -23,7 +23,7 @@ public class RobotNavigationConnector : MonoBehaviour
     {
         int robotSpeed = VirtualSpeedToActualSpeed(speed);
         Debug.Log("Moving at " + robotSpeed);
-        robotControl.Move(VirtualSpeedToActualSpeed(robotSpeed));
+        robotControl.Move(VirtualSpeedToActualSpeed(robotSpeed), VirtualSpeedToActualSpeed(robotSpeed));
     }
 
     private void OnVirtualRotate(float angle)
@@ -31,7 +31,7 @@ public class RobotNavigationConnector : MonoBehaviour
         int robotSpeed = VirtualAngleToActualSpeed(angle);
         Debug.Log("Rotating at " + robotSpeed);
 
-        robotControl.Rotate(robotSpeed);
+        robotControl.Rotate(robotSpeed, robotSpeed);
     }
 
     private int VirtualSpeedToActualSpeed(float speed)
