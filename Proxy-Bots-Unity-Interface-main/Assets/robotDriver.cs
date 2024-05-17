@@ -28,7 +28,7 @@ public class robotDriver : MonoBehaviour
             string name = this.gameObject.name;
             int i = int.Parse(name[name.Length-1].ToString());
 
-            print(i);
+            //print(i);
 
             executePath.destinationFinished[i-1] = false;
         }

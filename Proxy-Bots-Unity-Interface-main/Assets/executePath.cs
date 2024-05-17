@@ -34,6 +34,7 @@ public class executePath : MonoBehaviour
     public List<bool> destinationFinished = new List<bool>(new bool[6]);
 
     private Dictionary<int, int> robotStageMachineState = new Dictionary<int, int>(6);
+    private Dictionary<int, int> robotSpeedOffset = new Dictionary<int, int>(6); // to make the robot move forward in a straight line
 
     public bool bakeNavMesh = false;
 
@@ -89,7 +90,7 @@ public class executePath : MonoBehaviour
 
                 float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
 
-                print(i + " " + turningAngle);
+                // print(i + " " + turningAngle);
 
                 // execute robot turning command if angle difference is bigger than threshold
                 if (!rotationFinished[i])
@@ -151,7 +152,7 @@ public class executePath : MonoBehaviour
 
             if (path.corners.Length > 1 & !destinationFinished[i])
             {
-                print(i + " " + Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]));
+                // print(i + " " + Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]));
 
                 // only execute when the heading direction is correct
                 if (rotationFinished[i])
@@ -167,13 +168,41 @@ public class executePath : MonoBehaviour
                     }
                     else
                     {
-                        if (Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]) < arrivingThreshold * 8)
+                        // check if the heading direction is still correct
+                        Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
+                        Vector3 turningDirection = path.corners[1] - path.corners[0];
+
+                        float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
+
+                        int leftOffset;
+                        int rightOffset;
+
+                        if (Mathf.Abs(turningAngle) > 5)
                         {
-                            robotControl.RobotMove(3, movingSpeedL/2, movingSpeedR/2, robotName); // index 3: move forward
+                            if (turningAngle < 0)
+                            {
+                                leftOffset = 5;
+                                rightOffset = 0;
+                            }
+                            else
+                            {
+                                leftOffset = 0;
+                                rightOffset = 5;
+                            }
                         }
                         else
                         {
-                            robotControl.RobotMove(3, movingSpeedL, movingSpeedR, robotName); // index 3: move forward
+                            leftOffset = 0;
+                            rightOffset = 0;
+                        }
+
+                        if (Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]) < arrivingThreshold * 8)
+                        {
+                            robotControl.RobotMove(3, (movingSpeedL + leftOffset)/2, (movingSpeedR + rightOffset)/2, robotName); // index 3: move forward
+                        }
+                        else
+                        {
+                            robotControl.RobotMove(3, movingSpeedL + leftOffset, movingSpeedR + rightOffset, robotName); // index 3: move forward
                         }
 
                         stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward";
@@ -182,6 +211,47 @@ public class executePath : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void dynamicSpeedAdapting() // not finished yet
+    {
+        // only enter this when the heading direction is different to the destination direction by directionThreshold / 2
+        // adjust the speed based on the angular difference and the total distance away from the destination
+
+        for (int i = 0; i < 6; i++)
+        {
+            NavMeshPath path = agents[i].GetComponent<NavMeshAgent>().path;
+            string robotName = "/bot" + (i + 1).ToString();
+
+            Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
+            Vector3 turningDirection = path.corners[1] - path.corners[0];
+
+            float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
+
+            int rsL, rsR;
+
+            if (Mathf.Abs(turningAngle) < turningThreshold / 2)
+            {
+                rsL = rotationSpeedL / 2;
+                rsR = rotationSpeedR / 2;
+            }
+            else
+            {
+                rsL = rotationSpeedL;
+                rsR = rotationSpeedR;
+            }
+
+            if (turningAngle < 0)
+            {
+                robotSpeedOffset[i] += 5;
+            }
+            else
+            {
+                robotSpeedOffset[i] -= 5;
+            }
+
+            robotControl.RobotMove(3, rsL + robotSpeedOffset[i], rsR, robotName); // index 3: move forward
         }
     }
 }
