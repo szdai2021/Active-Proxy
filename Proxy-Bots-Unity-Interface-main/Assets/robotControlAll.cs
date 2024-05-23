@@ -13,6 +13,9 @@ public class robotControlAll : MonoBehaviour
     public int testSpeedR = 100;
     public bool enableKeystrokeTest;
 
+    public List<int> speedLOffset = new List<int>(6);
+    public List<int> speedROffset = new List<int>(6);
+
     private List<string> robotList = new List<string>(6);
     
     private void Start()
@@ -76,10 +79,43 @@ public class robotControlAll : MonoBehaviour
     {
         foreach (string n in robotList)
         {
+            int spL = speedL;
+            int spR = speedR;
+
+            switch (name)
+            {
+                case "/bot1":
+                    spL += speedLOffset[0];
+                    spR += speedROffset[0];
+                    break;
+                case "/bot2":
+                    spL += speedLOffset[1];
+                    spR += speedROffset[1];
+                    break;
+                case "/bot3":
+                    spL += speedLOffset[2];
+                    spR += speedROffset[2];
+                    break;
+                case "/bot4":
+                    spL += speedLOffset[3];
+                    spR += speedROffset[3];
+                    break;
+                case "/bot5":
+                    spL += speedLOffset[4];
+                    spR += speedROffset[4];
+                    break;
+                case "/bot6":
+                    spL += speedLOffset[5];
+                    spR += speedROffset[5];
+                    break;
+                default:
+                    break;
+            }
+
             var message = new OSCMessage(n);
             message.AddValue(OSCValue.Int(mode));
-            message.AddValue(OSCValue.Int(speedL));
-            message.AddValue(OSCValue.Int(speedR));
+            message.AddValue(OSCValue.Int(spL));
+            message.AddValue(OSCValue.Int(spR));
             transmitter.Send(message);
         }
     }
