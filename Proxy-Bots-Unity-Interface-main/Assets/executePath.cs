@@ -33,10 +33,9 @@ public class executePath : MonoBehaviour
     private List<bool> rotationFinished = new List<bool>(new bool[6]);
     public List<bool> destinationFinished = new List<bool>(new bool[6]);
 
-    private Dictionary<int, int> robotStageMachineState = new Dictionary<int, int>(6);
-    private Dictionary<int, int> robotSpeedOffset = new Dictionary<int, int>(6); // to make the robot move forward in a straight line
-
     public bool bakeNavMesh = false;
+
+    public bool orientationCheck = false;
 
     // Update is called once per frame
     void Update()
@@ -49,7 +48,24 @@ public class executePath : MonoBehaviour
             stopRobotAfterArriving();
         }
 
-        
+        if (orientationCheck)
+        {
+            // to do: add orientation of each robot by condition / or do this in external script
+
+            rotateRobotByPath();
+
+            bool t = true;
+
+            foreach (bool b in rotationFinished)
+            {
+                t = t & b;
+            }
+
+            if (t) // make orientationCheck to false if all rotationFinished flags are true
+            {
+                orientationCheck = false;
+            }
+        }
 
         if (bakeNavMesh)
         {
@@ -177,24 +193,7 @@ public class executePath : MonoBehaviour
                         int leftOffset;
                         int rightOffset;
 
-                        if (Mathf.Abs(turningAngle) > 5)
-                        {
-                            if (turningAngle < 0)
-                            {
-                                leftOffset = 5;
-                                rightOffset = 0;
-                            }
-                            else
-                            {
-                                leftOffset = 0;
-                                rightOffset = 5;
-                            }
-                        }
-                        else
-                        {
-                            leftOffset = 0;
-                            rightOffset = 0;
-                        }
+                        adjustMoveSpeed(out leftOffset, out rightOffset, turningAngle, i);
 
                         if (Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]) < arrivingThreshold * 8)
                         {
@@ -214,44 +213,29 @@ public class executePath : MonoBehaviour
         }
     }
 
-    private void dynamicSpeedAdapting() // not finished yet
+    private void adjustMoveSpeed(out int leftOffset, out int rightOffset, float turningAngle, int i)
     {
-        // only enter this when the heading direction is different to the destination direction by directionThreshold / 2
-        // adjust the speed based on the angular difference and the total distance away from the destination
+        leftOffset = 0;
+        rightOffset = 0;
 
-        for (int i = 0; i < 6; i++)
+        if (Mathf.Abs(turningAngle) > 5)
         {
-            NavMeshPath path = agents[i].GetComponent<NavMeshAgent>().path;
-            string robotName = "/bot" + (i + 1).ToString();
-
-            Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
-            Vector3 turningDirection = path.corners[1] - path.corners[0];
-
-            float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
-
-            int rsL, rsR;
-
-            if (Mathf.Abs(turningAngle) < turningThreshold / 2)
-            {
-                rsL = rotationSpeedL / 2;
-                rsR = rotationSpeedR / 2;
-            }
-            else
-            {
-                rsL = rotationSpeedL;
-                rsR = rotationSpeedR;
-            }
-
             if (turningAngle < 0)
             {
-                robotSpeedOffset[i] += 5;
+                rightOffset = 5 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
+                leftOffset = 0;
             }
             else
             {
-                robotSpeedOffset[i] -= 5;
+                rightOffset = 0;
+                leftOffset = 5 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
             }
-
-            robotControl.RobotMove(3, rsL + robotSpeedOffset[i], rsR, robotName); // index 3: move forward
+        }
+        else
+        {
+            leftOffset = 0;
+            rightOffset = 0;
         }
     }
+
 }

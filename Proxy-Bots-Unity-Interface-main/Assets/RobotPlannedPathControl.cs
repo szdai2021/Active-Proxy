@@ -163,7 +163,6 @@ public class RobotPlannedPathControl : MonoBehaviour
 
     private void moveRobotByPath()
     {
-
         // calculate distance and execute
         for (int i = 0; i < 6; i++)
         {
