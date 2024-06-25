@@ -8,13 +8,12 @@ using System;
 public class executePath : MonoBehaviour
 {
     public GameObject[] agents;
+    public GameObject[] destinations;
 
     public RobotControl robotControl;
     public GameObject navMeshParent;
 
     public GameObject stateInfoBoard;
-
-    public Dictionary<int, List<Vector3>> pathDic = new Dictionary<int, List<Vector3>>(6);
 
     [Header("--- Robot Configuration ---", order = 1)]
     [Space(-10, order = 2)]
@@ -32,8 +31,11 @@ public class executePath : MonoBehaviour
 
     private List<bool> rotationFinished = new List<bool>(new bool[6]);
     public List<bool> destinationFinished = new List<bool>(new bool[6]);
+    public List<bool> orientationFinished = new List<bool>(new bool[6]);
+    [HideInInspector]
+    public List<bool> agentPickedUp = new List<bool>(new bool[6]);
 
-    public bool bakeNavMesh = false;
+    private List<Vector3> path = new List<Vector3>(new Vector3[6]);
 
     public bool orientationCheck = false;
 
@@ -42,67 +44,60 @@ public class executePath : MonoBehaviour
     {
         if (start)
         {
-            rotateRobotByPath();
-            moveRobotByPath();
-
-            stopRobotAfterArriving();
-        }
-
-        if (orientationCheck)
-        {
-            // to do: add orientation of each robot by condition / or do this in external script
-
-            rotateRobotByPath();
-
-            bool t = true;
-
-            foreach (bool b in rotationFinished)
+            for (int i = 0; i < 6; i++)
             {
-                t = t & b;
-            }
+                if (!agentPickedUp[i])
+                {
+                    path = new List<Vector3>(new Vector3[6]);
 
-            if (t) // make orientationCheck to false if all rotationFinished flags are true
-            {
-                orientationCheck = false;
-            }
-        }
+                    foreach (Vector3 v in agents[i].GetComponent<NavMeshAgent>().path.corners)
+                    {
+                        path.Insert(path.Count - 1, v);
+                    }
 
-        if (bakeNavMesh)
-        {
-            foreach (Transform t in navMeshParent.transform)
-            {
-                t.gameObject.GetComponent<NavMeshSurface>().BuildNavMesh();
-            }
+                    rotateRobotByPath(path, i);
+                    moveRobotByPath(path, i);
 
-            bakeNavMesh = false;
+                    stopRobotAfterArriving(i);
+
+                    /*
+                    if (destinationFinished[1])
+                    {
+                        if (!orientationFinished[i])
+                        {
+                            path = new List<Vector3>();
+
+                            path.Insert(0, destinations[i].transform.GetChild(0).position);
+                            path.Insert(0, destinations[i].transform.position);
+
+                            orientationMatch(path, i);
+                        }
+
+                    }
+                    */
+                }
+            }
         }
 
     }
 
-    private void stopRobotAfterArriving()
+    private void stopRobotAfterArriving(int i)
     {
-        for (int i = 0; i < 6; i++)
+        string robotName = "/bot" + (i + 1).ToString();
+        if (destinationFinished[i])
         {
-            string robotName = "/bot" + (i + 1).ToString();
-            if (destinationFinished[i])
-            {
-                robotControl.Stop(robotName);
-            }
+            robotControl.Stop(robotName);
         }
     }
 
-    private void rotateRobotByPath()
+    private void rotateRobotByPath(List<Vector3> plannedPath, int i)
     {
-        // calculate turning angle and execute
-        for (int i = 0; i < 6; i++)
-        {
-            NavMeshPath path = agents[i].GetComponent<NavMeshAgent>().path;
-            string robotName = "/bot" + (i + 1).ToString();
+        string robotName = "/bot" + (i + 1).ToString();
 
-            if (path.corners.Length > 1 & !destinationFinished[i])
+        if (plannedPath.Count > 1 & !destinationFinished[i])
             {
                 Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
-                Vector3 turningDirection = path.corners[1] - path.corners[0];
+                Vector3 turningDirection = plannedPath[1] - plannedPath[0];
 
                 float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
 
@@ -153,20 +148,62 @@ public class executePath : MonoBehaviour
                     }
                 }
             }
-        }
-
     }
 
-    private void moveRobotByPath()
+
+    private void orientationMatch(List<Vector3> plannedPath, int i)
     {
-        
-        // calculate distance and execute
-        for (int i = 0; i < 6; i++)
+        string robotName = "/bot" + (i + 1).ToString();
+
+        if (plannedPath.Count > 1 & destinationFinished[i])
         {
-            NavMeshPath path = agents[i].GetComponent<NavMeshAgent>().path;
+            Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
+            Vector3 turningDirection = plannedPath[1] - plannedPath[0];
+
+            float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
+
+            // execute robot turning command if angle difference is bigger than threshold
+            if (destinationFinished[i])
+            {
+                if (Mathf.Abs(turningAngle) > 5)
+                {
+                    int rsL, rsR;
+
+                    if (Mathf.Abs(turningAngle) < 45)
+                    {
+                        rsL = rotationSpeedL / 2;
+                        rsR = rotationSpeedR / 2;
+                    }
+                    else
+                    {
+                        rsL = rotationSpeedL;
+                        rsR = rotationSpeedR;
+                    }
+
+                    if (turningAngle < 0)
+                    {
+                        robotControl.RobotMove(1, rsL, rsR, robotName); // index 1: left turn
+                    }
+                    else
+                    {
+                        robotControl.RobotMove(2, rsL, rsR, robotName); // index 2: right turn
+                    }
+                }
+                else
+                {
+                    orientationFinished[i] = true;
+                    robotControl.Stop(robotName);
+                }
+            }
+        }
+    }
+
+
+    private void moveRobotByPath(List<Vector3> plannedPath, int i)
+    {
             string robotName = "/bot" + (i + 1).ToString();
 
-            if (path.corners.Length > 1 & !destinationFinished[i])
+            if (plannedPath.Count > 1 & !destinationFinished[i])
             {
                 // print(i + " " + Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]));
 
@@ -174,7 +211,7 @@ public class executePath : MonoBehaviour
                 if (rotationFinished[i])
                 {
                     // execute robot turning command if angle difference is bigger than threshold
-                    if (Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length-1]) < arrivingThreshold)
+                    if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < arrivingThreshold)
                     {
                         robotControl.Stop(robotName);
 
@@ -186,7 +223,7 @@ public class executePath : MonoBehaviour
                     {
                         // check if the heading direction is still correct
                         Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
-                        Vector3 turningDirection = path.corners[1] - path.corners[0];
+                        Vector3 turningDirection = plannedPath[1] - plannedPath[0];
 
                         float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
 
@@ -195,7 +232,7 @@ public class executePath : MonoBehaviour
 
                         adjustMoveSpeed(out leftOffset, out rightOffset, turningAngle, i);
 
-                        if (Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]) < arrivingThreshold * 8)
+                        if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < arrivingThreshold * 8)
                         {
                             robotControl.RobotMove(3, (movingSpeedL + leftOffset)/2, (movingSpeedR + rightOffset)/2, robotName); // index 3: move forward
                         }
@@ -210,7 +247,6 @@ public class executePath : MonoBehaviour
                     }
                 }
             }
-        }
     }
 
     private void adjustMoveSpeed(out int leftOffset, out int rightOffset, float turningAngle, int i)
