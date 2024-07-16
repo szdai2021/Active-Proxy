@@ -3544,7 +3544,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: 31e4f6a896ee26d43800be5762f4f3eb, type: 2}
+  m_NavMeshData: {fileID: 0}
 --- !u!1 &99391684
 GameObject:
   m_ObjectHideFlags: 0
@@ -7023,7 +7023,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: 0ed9dc6157d4d304ab258022405e3695, type: 2}
+  m_NavMeshData: {fileID: 0}
 --- !u!1 &230969851
 GameObject:
   m_ObjectHideFlags: 0
@@ -8429,7 +8429,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: fcf434ab0a98e4f48bbd1c07afe3f707, type: 2}
+  m_NavMeshData: {fileID: 0}
 --- !u!1 &280074480
 GameObject:
   m_ObjectHideFlags: 0
@@ -13843,7 +13843,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bd879f7d8fc9c5478c0416d1f574973, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ipAddress: ws://192.168.50.105:8080
+  ipAddress: ws://192.168.10.114:8080
 --- !u!1 &483426639
 GameObject:
   m_ObjectHideFlags: 0
@@ -32685,49 +32685,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1151418509}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1151578586
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1151578587}
-  - component: {fileID: 1151578588}
-  m_Layer: 0
-  m_Name: TileProvider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1151578587
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1151578586}
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 999.9997, y: 1000, z: 999.9997}
-  m_Children: []
-  m_Father: {fileID: 1828807834}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1151578588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1151578586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d7ff8ed3b76a4ee5a451d64a5393e3f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1153564271
 GameObject:
   m_ObjectHideFlags: 0
@@ -41185,7 +41142,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: 41149615e4d256f46abdb7fe83e38461, type: 2}
+  m_NavMeshData: {fileID: 0}
 --- !u!1 &1413359324
 GameObject:
   m_ObjectHideFlags: 0
@@ -49140,7 +49097,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: b878540776a63824e99c411e9bce5bf9, type: 2}
+  m_NavMeshData: {fileID: 0}
 --- !u!1 &1664844877
 GameObject:
   m_ObjectHideFlags: 0
@@ -52949,7 +52906,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4867834046800562, guid: e6b749c6d877f4c19a5a5c3c0783d53b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11
+      value: -46.94097
       objectReference: {fileID: 0}
     - target: {fileID: 4867834046800562, guid: e6b749c6d877f4c19a5a5c3c0783d53b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -53008,7 +52965,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _tileProvider
       value: 
-      objectReference: {fileID: 1151578588}
+      objectReference: {fileID: 0}
     - target: {fileID: 114478715909612932, guid: e6b749c6d877f4c19a5a5c3c0783d53b,
         type: 3}
       propertyPath: _options.locationOptions.latitudeLongitude
@@ -56042,7 +55999,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: c4ee67ec102adfc4eb52dc194f614413, type: 2}
+  m_NavMeshData: {fileID: 0}
 --- !u!1 &1913880987
 GameObject:
   m_ObjectHideFlags: 0
