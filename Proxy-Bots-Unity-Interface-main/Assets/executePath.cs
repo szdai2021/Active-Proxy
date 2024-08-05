@@ -29,10 +29,9 @@ public class executePath : MonoBehaviour
 
     public bool start = false;
 
-    private List<bool> rotationFinished = new List<bool>(new bool[6]);
+    public List<bool> rotationFinished = new List<bool>(new bool[6]);
     public List<bool> destinationFinished = new List<bool>(new bool[6]);
     public List<bool> orientationFinished = new List<bool>(new bool[6]);
-    [HideInInspector]
     public List<bool> agentPickedUp = new List<bool>(new bool[6]);
 
     private List<Vector3> path = new List<Vector3>(new Vector3[6]);
@@ -48,11 +47,15 @@ public class executePath : MonoBehaviour
             {
                 if (!agentPickedUp[i])
                 {
-                    path = new List<Vector3>(new Vector3[6]);
+                    path = new List<Vector3>();
 
-                    foreach (Vector3 v in agents[i].GetComponent<NavMeshAgent>().path.corners)
+                    // Get the NavMeshAgent component
+                    NavMeshAgent navMeshAgent = agents[i].GetComponent<NavMeshAgent>();
+
+                    if (navMeshAgent != null && navMeshAgent.hasPath)
                     {
-                        path.Insert(path.Count - 1, v);
+                        // Add all corners of the path to the list
+                        path.AddRange(navMeshAgent.path.corners);
                     }
 
                     rotateRobotByPath(path, i);
@@ -60,7 +63,6 @@ public class executePath : MonoBehaviour
 
                     stopRobotAfterArriving(i);
 
-                    /*
                     if (destinationFinished[1])
                     {
                         if (!orientationFinished[i])
@@ -72,9 +74,12 @@ public class executePath : MonoBehaviour
 
                             orientationMatch(path, i);
                         }
-
                     }
-                    */
+                }
+                else
+                {
+                    destinationFinished[i] = true;
+                    orientationFinished[i] = true;
                 }
             }
         }
@@ -84,7 +89,7 @@ public class executePath : MonoBehaviour
     private void stopRobotAfterArriving(int i)
     {
         string robotName = "/bot" + (i + 1).ToString();
-        if (destinationFinished[i])
+        if (destinationFinished[i] & orientationFinished[i])
         {
             robotControl.Stop(robotName);
         }
@@ -101,7 +106,7 @@ public class executePath : MonoBehaviour
 
                 float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
 
-                // print(i + " " + turningAngle);
+                //print(i + " " + turningAngle + " " + headingDirection.ToString("F4") + " " + turningDirection.ToString("F4"));
 
                 // execute robot turning command if angle difference is bigger than threshold
                 if (!rotationFinished[i])
@@ -123,11 +128,11 @@ public class executePath : MonoBehaviour
 
                         if (turningAngle < 0)
                         {
-                            robotControl.RobotMove(1, rsL, rsR, robotName); // index 1: left turn
+                            robotControl.RobotMove(3, rsL, rsR, robotName); // index 1: left turn
                         } 
                         else
                         {
-                            robotControl.RobotMove(2, rsL, rsR, robotName); // index 2: right turn
+                            robotControl.RobotMove(4, rsL, rsR, robotName); // index 2: right turn
                         }
 
                         stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Rotating";
@@ -142,6 +147,8 @@ public class executePath : MonoBehaviour
                 }
                 else
                 {
+                    robotControl.Stop(robotName);
+
                     if (Mathf.Abs(turningAngle) > turningThreshold)
                     {
                         rotationFinished[i] = false;
@@ -149,7 +156,6 @@ public class executePath : MonoBehaviour
                 }
             }
     }
-
 
     private void orientationMatch(List<Vector3> plannedPath, int i)
     {
@@ -182,11 +188,11 @@ public class executePath : MonoBehaviour
 
                     if (turningAngle < 0)
                     {
-                        robotControl.RobotMove(1, rsL, rsR, robotName); // index 1: left turn
+                        robotControl.RobotMove(3, rsL, rsR, robotName); // index 1: left turn
                     }
                     else
                     {
-                        robotControl.RobotMove(2, rsL, rsR, robotName); // index 2: right turn
+                        robotControl.RobotMove(4, rsL, rsR, robotName); // index 2: right turn
                     }
                 }
                 else
@@ -197,7 +203,6 @@ public class executePath : MonoBehaviour
             }
         }
     }
-
 
     private void moveRobotByPath(List<Vector3> plannedPath, int i)
     {
@@ -227,21 +232,24 @@ public class executePath : MonoBehaviour
 
                         float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
 
-                        int leftOffset;
-                        int rightOffset;
+                        int leftOffset = 0;
+                        int rightOffset = 0;
 
                         adjustMoveSpeed(out leftOffset, out rightOffset, turningAngle, i);
 
-                        if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < arrivingThreshold * 8)
+                        if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < arrivingThreshold * 2f)
                         {
-                            robotControl.RobotMove(3, (movingSpeedL + leftOffset)/2, (movingSpeedR + rightOffset)/2, robotName); // index 3: move forward
+                            robotControl.RobotMove(1, (80 + leftOffset)/2, (80 + rightOffset)/2, robotName); // index 3: move forward
+                            stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward 1";
                         }
                         else
                         {
-                            robotControl.RobotMove(3, movingSpeedL + leftOffset, movingSpeedR + rightOffset, robotName); // index 3: move forward
+                            robotControl.RobotMove(1, movingSpeedL + leftOffset, movingSpeedR + rightOffset, robotName); // index 3: move forward
+
+                            stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward 2";
                         }
 
-                        stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward";
+                        
 
                         destinationFinished[i] = false;
                     }
@@ -258,13 +266,13 @@ public class executePath : MonoBehaviour
         {
             if (turningAngle < 0)
             {
-                rightOffset = 5 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
+                rightOffset = 10 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
                 leftOffset = 0;
             }
             else
             {
                 rightOffset = 0;
-                leftOffset = 5 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
+                leftOffset = 10 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
             }
         }
         else
@@ -273,5 +281,4 @@ public class executePath : MonoBehaviour
             rightOffset = 0;
         }
     }
-
 }

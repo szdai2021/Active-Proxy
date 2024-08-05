@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using WebSocketSharp;
+using System.Text.RegularExpressions;
 
 public class ConnectionManager : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class ConnectionManager : MonoBehaviour
     {
         if (ws != null && ws.IsAlive)
         {
-            Debug.Log(message);
+            //Debug.Log(message);
             ws.Send(message);
         }
         else
@@ -43,48 +44,24 @@ public class ConnectionManager : MonoBehaviour
 
     private void Ws_OnMessage(object sender, MessageEventArgs e)
     {
-        print(e.ToString());
+        string pattern = @"marker-(\d+):\((\d+\.\d+),(\d+\.\d+),(\d+\.\d+)\)";
+        MatchCollection matches = Regex.Matches(e.Data, pattern);
 
-        // break down
-        // i - index; px, py - position; r - rotation; e - event
-
-        string strings = e.ToString();
-        string[] stringLines = strings.Split(' ');
-
-        Vector2 p = Vector2.zero;
-        float r = 0;
-        int i = -1;
-
-        foreach (string s in stringLines)
+        foreach (Match match in matches)
         {
-            if (s.StartsWith("i"))
+            if (match.Groups.Count == 5)
             {
-                i = int.Parse(s.Substring(1));
-            }
+                int index = int.Parse(match.Groups[1].Value);
+                Vector2 p = new Vector2(
+                    float.Parse(match.Groups[2].Value),
+                    float.Parse(match.Groups[3].Value)
+                );
+                float angle = float.Parse(match.Groups[4].Value);
 
-            if (s.StartsWith("px"))
-            {
-                p.x = float.Parse(s.Substring(1));
-            }
-
-            if (s.StartsWith("py"))
-            {
-                p.y = float.Parse(s.Substring(1));
-            }
-
-            if (s.StartsWith("r"))
-            {
-                r = float.Parse(s.Substring(1));
-            }
-
-            if (s.StartsWith("e"))
-            {
-                // event trigger: to do
+                posReceived[index] = p;
+                rotReceived[index] = angle;
             }
         }
-
-        posReceived[i] = p;
-        rotReceived[i] = r;
     }
 
     private void Ws_OnError(object sender, ErrorEventArgs e)

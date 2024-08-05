@@ -31,6 +31,7 @@ public class robotDriver : MonoBehaviour
             //print(i);
 
             executePath.destinationFinished[i-1] = false;
+            executePath.orientationFinished[i - 1] = false;
         }
 
         if (stopRobot)

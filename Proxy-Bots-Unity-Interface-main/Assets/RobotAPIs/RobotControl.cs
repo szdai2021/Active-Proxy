@@ -27,7 +27,7 @@ public class RobotControl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.W))
             {
-                RobotMove(3, testSpeedL, testSpeedR);               
+                RobotMove(1, testSpeedL, testSpeedR);               
 
             }
             if (Input.GetKeyUp(KeyCode.W))
@@ -37,7 +37,7 @@ public class RobotControl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.S))
             {
-                RobotMove(4, testSpeedL, testSpeedR);
+                RobotMove(2, testSpeedL, testSpeedR);
 
             }
             if (Input.GetKeyUp(KeyCode.S))
@@ -47,7 +47,7 @@ public class RobotControl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.A))
             {
-                RobotMove(1, testSpeedL, testSpeedR);
+                RobotMove(3, testSpeedL, testSpeedR);
 
             }
             if (Input.GetKeyUp(KeyCode.A))
@@ -57,7 +57,7 @@ public class RobotControl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.D))
             {
-                RobotMove(2, testSpeedL, testSpeedR);
+                RobotMove(4, testSpeedL, testSpeedR);
 
             }
             if (Input.GetKeyUp(KeyCode.D))
