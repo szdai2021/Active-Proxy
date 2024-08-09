@@ -9,8 +9,8 @@ public class SMPickUp : SingleManipulation
     public Transform zonePlane;
     private float pickUpThreshold = 0.05f;
     private static int bufferLength = 90;
-    private bool onSurface = false;
-    private bool onAirDwell = false;
+    public bool onSurface = false;
+    public bool onAirDwell = false;
     private Queue<Vector3> lastPositions = new Queue<Vector3>(bufferLength);
 
     public UnityEvent OnPickUp = new UnityEvent();

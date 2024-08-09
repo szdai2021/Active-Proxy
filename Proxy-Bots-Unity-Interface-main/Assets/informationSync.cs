@@ -101,9 +101,9 @@ public class informationSync : MonoBehaviour
 
                     Thread.Sleep(1);
                 }
-                Thread.Sleep(1);
+                Thread.Sleep(10);
             }
-            Thread.Sleep(1);
+            Thread.Sleep(5);
         }
     }
 

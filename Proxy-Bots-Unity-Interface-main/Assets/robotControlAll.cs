@@ -17,7 +17,25 @@ public class robotControlAll : MonoBehaviour
     public List<int> speedROffset = new List<int>(6);
 
     private List<string> robotList = new List<string>(6);
-    
+
+    public bool robotTest;
+
+    private IEnumerator robotMoveTest()
+    {
+        while (true)
+        {
+            if (robotTest)
+            {
+                int L = Random.Range(150, 200);
+                int R = Random.Range(150, 200);
+                RobotMove(1, L, R, "/bot2");
+                yield return new WaitForSeconds(0.05f);
+            }
+            yield return new WaitForSeconds(0.05f);
+        }
+        
+    }
+
     private void Start()
     {
         robotList.Add("/bot1");
@@ -26,6 +44,8 @@ public class robotControlAll : MonoBehaviour
         robotList.Add("/bot4");
         robotList.Add("/bot5");
         robotList.Add("/bot6");
+
+        StartCoroutine(robotMoveTest());
     }
 
     void Update()

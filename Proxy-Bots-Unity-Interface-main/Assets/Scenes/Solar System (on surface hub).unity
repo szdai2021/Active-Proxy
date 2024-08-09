@@ -7022,6 +7022,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 82565837}
+  SMPickUp: {fileID: 0}
   OnPitchExit:
     m_PersistentCalls:
       m_Calls:
@@ -7152,6 +7153,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 957498408}
   zonePlane: {fileID: 2104156057}
+  onSurface: 0
+  onAirDwell: 0
   OnPickUp:
     m_PersistentCalls:
       m_Calls:
@@ -9239,6 +9242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 957498408}
+  SMPickUp: {fileID: 0}
   OnPitchExit:
     m_PersistentCalls:
       m_Calls:
@@ -10748,6 +10752,7 @@ GameObject:
   m_Component:
   - component: {fileID: 328777747}
   - component: {fileID: 328777748}
+  - component: {fileID: 328777749}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -10776,7 +10781,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 328777746}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8fda7d9e1ba12b409e45c2f6ec95d8f, type: 3}
   m_Name: 
@@ -10786,6 +10791,20 @@ MonoBehaviour:
   posSycFlag: 1
   rotSycFlag: 1
   VICON: 1
+--- !u!114 &328777749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328777746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8528e72673d8785478a6cd948b6b9d22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  temp: {fileID: 1372909791}
+  scynTarget: {fileID: 384642029}
 --- !u!1 &336120256
 GameObject:
   m_ObjectHideFlags: 0
@@ -12737,6 +12756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 977102693}
+  SMPickUp: {fileID: 0}
   OnPitchExit:
     m_PersistentCalls:
       m_Calls:
@@ -20504,6 +20524,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 82565837}
   zonePlane: {fileID: 0}
+  onSurface: 0
+  onAirDwell: 0
   OnPickUp:
     m_PersistentCalls:
       m_Calls:
@@ -21285,6 +21307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1399983075}
+  SMPickUp: {fileID: 0}
   OnPitchExit:
     m_PersistentCalls:
       m_Calls:
@@ -22741,13 +22764,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 775308749}
-  m_LocalRotation: {x: -0.0021463262, y: -0.31491634, z: 0.0015185743, w: 0.9491158}
-  m_LocalPosition: {x: 0.014, y: -0, z: -0.004}
+  m_LocalRotation: {x: -0.0021140913, y: 0.10515895, z: 0.00032434595, w: 0.99445313}
+  m_LocalPosition: {x: -0.016, y: -0, z: 0.003}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1195782020}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -0.179, y: -36.712, z: 0.24300002}
+  m_LocalEulerAnglesHint: {x: -0.245, y: 12.073001, z: 0.011000001}
 --- !u!114 &775308751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23368,7 +23391,7 @@ MonoBehaviour:
   robotControl: {fileID: 887831676}
   navMeshParent: {fileID: 280174796}
   stateInfoBoard: {fileID: 1315523321}
-  arrivingThreshold: 0.04
+  arrivingThreshold: 0.025
   turningThreshold: 10
   rotationSpeedL: 50
   rotationSpeedR: 50
@@ -23379,7 +23402,6 @@ MonoBehaviour:
   destinationFinished: 000000000000
   orientationFinished: 000000000000
   agentPickedUp: 000000000000
-  orientationCheck: 0
 --- !u!1 &797835101
 GameObject:
   m_ObjectHideFlags: 0
@@ -26355,6 +26377,8 @@ MonoBehaviour:
   speedROffset: 000000000000000000000000000000000000000000000000
   robotParent: {fileID: 242517715}
   colliderParent: {fileID: 1933237896}
+  robotEnable: 000100000000
+  robotStopped: 010101010101
 --- !u!4 &887831677
 Transform:
   m_ObjectHideFlags: 0
@@ -26457,6 +26481,7 @@ MonoBehaviour:
   enableKeystrokeTest: 1
   speedLOffset: 000000000000000000000000000000000000000000000000
   speedROffset: 000000000000000000000000000000000000000000000000
+  robotTest: 0
 --- !u!1 &888615595
 GameObject:
   m_ObjectHideFlags: 0
@@ -28200,6 +28225,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 140257837}
   zonePlane: {fileID: 2104156057}
+  onSurface: 0
+  onAirDwell: 0
   OnPickUp:
     m_PersistentCalls:
       m_Calls:
@@ -33382,6 +33409,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1059520715}
   zonePlane: {fileID: 0}
+  onSurface: 0
+  onAirDwell: 0
   OnPickUp:
     m_PersistentCalls:
       m_Calls:
@@ -37212,6 +37241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 140257837}
+  SMPickUp: {fileID: 942940042}
   OnPitchExit:
     m_PersistentCalls:
       m_Calls:
@@ -45897,6 +45927,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1399983075}
   zonePlane: {fileID: 0}
+  onSurface: 0
+  onAirDwell: 0
   OnPickUp:
     m_PersistentCalls:
       m_Calls:
@@ -46124,6 +46156,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1531142436}
   - component: {fileID: 1531142437}
+  - component: {fileID: 1531142438}
   m_Layer: 0
   m_Name: R-03
   m_TagString: Untagged
@@ -46160,6 +46193,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObjectName: bot03
   Client: {fileID: 1014886405}
+--- !u!114 &1531142438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1531142435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8fda7d9e1ba12b409e45c2f6ec95d8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sycChild: {fileID: 82565833}
+  TMcalculatation: {fileID: 0}
+  posSycFlag: 1
+  rotSycFlag: 1
+  VICON: 0
 --- !u!1 &1532269272
 GameObject:
   m_ObjectHideFlags: 0
@@ -49768,6 +49818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 162611152}
+  SMPickUp: {fileID: 0}
   OnPitchExit:
     m_PersistentCalls:
       m_Calls:
@@ -51631,6 +51682,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 162611152}
   zonePlane: {fileID: 0}
+  onSurface: 0
+  onAirDwell: 0
   OnPickUp:
     m_PersistentCalls:
       m_Calls:
@@ -51811,6 +51864,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 977102693}
   zonePlane: {fileID: 0}
+  onSurface: 0
+  onAirDwell: 0
   OnPickUp:
     m_PersistentCalls:
       m_Calls:
@@ -58255,6 +58310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1059520715}
+  SMPickUp: {fileID: 0}
   OnPitchExit:
     m_PersistentCalls:
       m_Calls:

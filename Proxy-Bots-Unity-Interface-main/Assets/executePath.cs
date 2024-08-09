@@ -36,8 +36,6 @@ public class executePath : MonoBehaviour
 
     private List<Vector3> path = new List<Vector3>(new Vector3[6]);
 
-    public bool orientationCheck = false;
-
     // Update is called once per frame
     void Update()
     {
@@ -58,10 +56,10 @@ public class executePath : MonoBehaviour
                         path.AddRange(navMeshAgent.path.corners);
                     }
 
-                    rotateRobotByPath(path, i);
-                    moveRobotByPath(path, i);
+                     rotateRobotByPath(path, i);
+                     moveRobotByPath(path, i);
 
-                    stopRobotAfterArriving(i);
+                     stopRobotAfterArriving(i);
 
                     if (destinationFinished[1])
                     {
@@ -91,7 +89,10 @@ public class executePath : MonoBehaviour
         string robotName = "/bot" + (i + 1).ToString();
         if (destinationFinished[i] & orientationFinished[i])
         {
-            robotControl.Stop(robotName);
+            if (!robotControl.robotStopped[i])
+            {
+                robotControl.Stop(robotName);
+            }
         }
     }
 
@@ -101,6 +102,7 @@ public class executePath : MonoBehaviour
 
         if (plannedPath.Count > 1 & !destinationFinished[i])
             {
+
                 Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
                 Vector3 turningDirection = plannedPath[1] - plannedPath[0];
 
@@ -140,14 +142,14 @@ public class executePath : MonoBehaviour
                     else
                     {
                         rotationFinished[i] = true;
-                        robotControl.Stop(robotName);
+                        //robotControl.Stop(robotName);
 
                         stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Stopping Rotation";
                     }
                 }
                 else
                 {
-                    robotControl.Stop(robotName);
+                    //robotControl.Stop(robotName);
 
                     if (Mathf.Abs(turningAngle) > turningThreshold)
                     {
@@ -218,7 +220,7 @@ public class executePath : MonoBehaviour
                     // execute robot turning command if angle difference is bigger than threshold
                     if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < arrivingThreshold)
                     {
-                        robotControl.Stop(robotName);
+                        //robotControl.Stop(robotName);
 
                         stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Stopping Moving";
 
@@ -237,9 +239,10 @@ public class executePath : MonoBehaviour
 
                         adjustMoveSpeed(out leftOffset, out rightOffset, turningAngle, i);
 
-                        if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < arrivingThreshold * 2f)
+                        /*
+                        if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < 0.06f)
                         {
-                            robotControl.RobotMove(1, (80 + leftOffset)/2, (80 + rightOffset)/2, robotName); // index 3: move forward
+                            robotControl.RobotMove(1, 80 + leftOffset, 80 + rightOffset, robotName); // index 3: move forward
                             stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward 1";
                         }
                         else
@@ -248,8 +251,13 @@ public class executePath : MonoBehaviour
 
                             stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward 2";
                         }
+                        */
 
-                        
+                        float distance = Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]);
+
+                        robotControl.RobotMove(1, rangeMapper(distance, 0.08f, 0.5f, 70 + leftOffset/10, movingSpeedL + leftOffset), rangeMapper(distance, 0.08f, 0.5f, 70 + rightOffset / 10, movingSpeedR + rightOffset), robotName); // index 3: move forward
+
+                        stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward";
 
                         destinationFinished[i] = false;
                     }
@@ -266,13 +274,13 @@ public class executePath : MonoBehaviour
         {
             if (turningAngle < 0)
             {
-                rightOffset = 10 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
+                rightOffset = 5 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
                 leftOffset = 0;
             }
             else
             {
                 rightOffset = 0;
-                leftOffset = 10 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
+                leftOffset = 5 * ((int)Mathf.Abs(turningAngle) / 5 + 1);
             }
         }
         else
@@ -280,5 +288,23 @@ public class executePath : MonoBehaviour
             leftOffset = 0;
             rightOffset = 0;
         }
+    }
+
+    private int rangeMapper(float value, float minOld, float maxOld, int minNew, int maxNew)
+    {
+        float normalized = (value - minOld) / (maxOld - minOld);
+        int newValue = minNew + Mathf.RoundToInt(normalized * (maxNew - minNew));
+
+        if (newValue > maxNew)
+        {
+            newValue = maxNew;
+        }
+
+        if (newValue < minNew)
+        {
+            newValue = minNew;
+        }
+
+        return newValue;
     }
 }

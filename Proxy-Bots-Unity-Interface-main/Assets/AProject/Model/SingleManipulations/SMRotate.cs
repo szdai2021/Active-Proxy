@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class SMRotate : SingleManipulation
 {
-
+    public SMPickUp SMPickUp;
     public UnityEvent OnPitchExit = new UnityEvent();
     public UnityEvent OnPitchForward = new UnityEvent();
     public UnityEvent OnPitchBackward = new UnityEvent();
@@ -63,7 +63,7 @@ public class SMRotate : SingleManipulation
 
     private void CheckRoll(float rollAngle)
     {
-        if (Mathf.Abs(rollAngle) > minAngle)
+        if (Mathf.Abs(rollAngle) > minAngle & SMPickUp.onAirDwell)
         {
             if (!isRolling)
             {
@@ -89,7 +89,7 @@ public class SMRotate : SingleManipulation
     private void CheckPitch(float pitchAngle)
     {
 
-        if (Mathf.Abs(pitchAngle) > minAngle)
+        if (Mathf.Abs(pitchAngle) > minAngle & SMPickUp.onAirDwell)
         {
             if (!isPitching)
             {

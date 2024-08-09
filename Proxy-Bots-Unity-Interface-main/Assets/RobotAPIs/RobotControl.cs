@@ -9,7 +9,7 @@ public class RobotControl : MonoBehaviour
 {
 
     public OSCTransmitter transmitter;
-    public string robotName = "/Robot1";
+    public string robotName = "/bot1";
     public int testSpeedL=100;
     public int testSpeedR = 100;
     public bool enableKeystrokeTest;
@@ -19,6 +19,33 @@ public class RobotControl : MonoBehaviour
 
     public GameObject robotParent;
     public GameObject colliderParent;
+
+    public bool[] robotEnable;
+    public List<bool> robotStopped = new List<bool> { true, true, true, true, true, true };
+
+    private List<Vector3> robotPosPre = new List<Vector3> { Vector3.zero, Vector3.zero , Vector3.zero, Vector3.zero , Vector3.zero , Vector3.zero };
+    private bool delayFlag = false;
+    private List<bool> delayRobotStopped = new List<bool> { true, true, true, true, true, true };
+
+    private IEnumerator delayTimer()
+    {
+        while (true)
+        {
+            if (delayFlag)
+            {
+                yield return new WaitForSeconds(1f);
+                robotStopped = delayRobotStopped;
+                delayFlag = false;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private void Start()
+    {
+        StartCoroutine(delayTimer());
+    }
 
     void Update()
     {
@@ -64,6 +91,16 @@ public class RobotControl : MonoBehaviour
             {
                 Stop();
             }
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            if (robotPosPre[i] != null & Vector3.Distance(robotPosPre[i], robotParent.transform.GetChild(i).position) > 0.01)
+            {
+                robotStopped[i] = false;
+            }
+
+            robotPosPre[i] = robotParent.transform.GetChild(i).position;
         }
     }
 
@@ -120,26 +157,39 @@ public class RobotControl : MonoBehaviour
             }
         }
 
-
         foreach(Transform t in colliderParent.transform)
         {
             if (t.gameObject.GetComponent<BoxCollider>().bounds.Contains(robotParent.transform.GetChild(i-1).transform.position))
             {
                 print("robot" + i + " is too close to the edge");
-                Stop(name);
-                return;
+
+                if (robotStopped[i-1])
+                {
+                    return;
+                }
+                else
+                {
+                    Stop(name);
+                    return;
+                }
             }
         }
 
-        var message = new OSCMessage(robotName);
-        message.AddValue(OSCValue.Int(mode));
-        message.AddValue(OSCValue.Int(spL)); 
-        message.AddValue(OSCValue.Int(spR));
-        transmitter.Send(message);
+        if (robotEnable[i-1])
+        {
+            var message = new OSCMessage(robotName);
+            message.AddValue(OSCValue.Int(mode));
+            message.AddValue(OSCValue.Int(spL));
+            message.AddValue(OSCValue.Int(spR));
+            transmitter.Send(message);
+
+            robotStopped[i-1] = false;
+            delayRobotStopped[i - 1] = false;
+        }
     }
 
     public void Move(int speedL, int speedR)
-    {       
+    {
         var message = new OSCMessage(robotName);
         message.AddValue(OSCValue.Int(1));
         message.AddValue(OSCValue.Int(speedL));
@@ -163,10 +213,15 @@ public class RobotControl : MonoBehaviour
             name = robotName;
         }
 
+        int i = int.Parse(name[name.Length - 1].ToString());
+
         var message = new OSCMessage(name);
         message.AddValue(OSCValue.Int(0)); 
         message.AddValue(OSCValue.Int(0));
         message.AddValue(OSCValue.Int(0));
         transmitter.Send(message);
+
+        delayFlag = true;
+        delayRobotStopped[i - 1] = true;
     }
 }
