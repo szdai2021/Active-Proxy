@@ -11,7 +11,7 @@ public class posClone : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        this.transform.position = parent.transform.position - (offsetReference.transform.position - this.transform.parent.transform.position);
-        this.transform.rotation = parent.transform.rotation;
+        this.transform.localPosition = parent.transform.localPosition;
+        this.transform.localRotation = parent.transform.localRotation;
     }
 }

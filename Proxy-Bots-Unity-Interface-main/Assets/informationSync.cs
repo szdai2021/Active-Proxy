@@ -12,6 +12,7 @@ public class informationSync : MonoBehaviour
     public GameObject referenceTopLeft;
     public GameObject referenceTopRight;
     public GameObject referenceBtmLeft;
+    public GameObject screenPositionHolder;
 
     private Thread websocketThread;
 
@@ -21,7 +22,7 @@ public class informationSync : MonoBehaviour
 
     private float widthMax, heightMax;
     private Dictionary<int, List<float>> agentsInfo = new Dictionary<int, List<float>>();
-
+    public Vector3 offset;
 
     private IEnumerator sendMessageCoroutine()
     {
@@ -118,9 +119,11 @@ public class informationSync : MonoBehaviour
     private void updateDestination(int index)
     {
         Transform t = destinationParent.transform.GetChild(index);
-        t.position = new Vector3(referenceTopLeft.transform.position.x - cm.posReceived[index].y * heightMax, t.position.y, referenceTopLeft.transform.position.z - cm.posReceived[index].x * widthMax);
-        
-        Quaternion rotationQuaternion = Quaternion.AngleAxis(cm.rotReceived[index] + 90, Vector3.up);
+        screenPositionHolder.transform.localPosition = new Vector3(referenceTopLeft.transform.localPosition.x - cm.posReceived[index].y * heightMax, screenPositionHolder.transform.localPosition.y, referenceTopLeft.transform.localPosition.z - cm.posReceived[index].x * widthMax);
+        screenPositionHolder.transform.localPosition += offset;
+        t.transform.position = screenPositionHolder.transform.position;
+
+        Quaternion rotationQuaternion = Quaternion.AngleAxis(cm.rotReceived[index], Vector3.up);
 
         t.rotation = rotationQuaternion;            
     }

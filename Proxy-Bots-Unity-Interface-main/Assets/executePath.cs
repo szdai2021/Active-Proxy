@@ -7,6 +7,7 @@ using System;
 
 public class executePath : MonoBehaviour
 {
+    public GameObject agentParent;
     public GameObject[] agents;
     public GameObject[] destinations;
 
@@ -43,6 +44,7 @@ public class executePath : MonoBehaviour
         {
             for (int i = 0; i < 6; i++)
             {
+                string robotName = "/bot" + (i + 1).ToString();
                 if (!agentPickedUp[i])
                 {
                     path = new List<Vector3>();
@@ -55,11 +57,24 @@ public class executePath : MonoBehaviour
                         // Add all corners of the path to the list
                         path.AddRange(navMeshAgent.path.corners);
                     }
+                    
+                    // secondary stop when arriving destination
+                    if (destinations[i].transform.GetComponent<CapsuleCollider>().bounds.Contains(agentParent.transform.GetChild(i).transform.position))
+                    {
+                        destinationFinished[i] = true;
+                        rotationFinished[i] = true;
+                    }
+                    else
+                    {
+                        if (Vector3.Distance(agents[i].transform.position, path[path.Count - 1]) > arrivingThreshold+0.01)
+                        {
+                            destinationFinished[i] = false;
+                        }
+                    }
 
-                     rotateRobotByPath(path, i);
+                    rotateRobotByPath(path, i);
+
                      moveRobotByPath(path, i);
-
-                     stopRobotAfterArriving(i);
 
                     if (destinationFinished[1])
                     {
@@ -73,11 +88,13 @@ public class executePath : MonoBehaviour
                             orientationMatch(path, i);
                         }
                     }
+                    stopRobotAfterArriving(i);
                 }
                 else
                 {
                     destinationFinished[i] = true;
                     orientationFinished[i] = true;
+                    robotControl.Stop(robotName);
                 }
             }
         }
@@ -89,10 +106,7 @@ public class executePath : MonoBehaviour
         string robotName = "/bot" + (i + 1).ToString();
         if (destinationFinished[i] & orientationFinished[i])
         {
-            if (!robotControl.robotStopped[i])
-            {
-                robotControl.Stop(robotName);
-            }
+            robotControl.Stop(robotName);
         }
     }
 
@@ -102,7 +116,6 @@ public class executePath : MonoBehaviour
 
         if (plannedPath.Count > 1 & !destinationFinished[i])
             {
-
                 Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
                 Vector3 turningDirection = plannedPath[1] - plannedPath[0];
 
@@ -142,7 +155,7 @@ public class executePath : MonoBehaviour
                     else
                     {
                         rotationFinished[i] = true;
-                        //robotControl.Stop(robotName);
+                        robotControl.Stop(robotName);
 
                         stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Stopping Rotation";
                     }
@@ -165,7 +178,7 @@ public class executePath : MonoBehaviour
 
         if (plannedPath.Count > 1 & destinationFinished[i])
         {
-            Vector3 headingDirection = agents[i].transform.GetChild(1).position - agents[i].transform.GetChild(0).position;
+            Vector3 headingDirection = agentParent.transform.GetChild(i).transform.GetChild(1).position - agentParent.transform.GetChild(i).transform.GetChild(0).position;
             Vector3 turningDirection = plannedPath[1] - plannedPath[0];
 
             float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);
@@ -212,15 +225,13 @@ public class executePath : MonoBehaviour
 
             if (plannedPath.Count > 1 & !destinationFinished[i])
             {
-                // print(i + " " + Vector3.Distance(agents[i].transform.position, path.corners[path.corners.Length - 1]));
-
-                // only execute when the heading direction is correct
-                if (rotationFinished[i])
+            // only execute when the heading direction is correct
+            if (rotationFinished[i])
                 {
                     // execute robot turning command if angle difference is bigger than threshold
                     if (Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]) < arrivingThreshold)
                     {
-                        //robotControl.Stop(robotName);
+                        robotControl.Stop(robotName);
 
                         stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Stopping Moving";
 
@@ -255,7 +266,7 @@ public class executePath : MonoBehaviour
 
                         float distance = Vector3.Distance(agents[i].transform.position, plannedPath[plannedPath.Count - 1]);
 
-                        robotControl.RobotMove(1, rangeMapper(distance, 0.08f, 0.5f, 70 + leftOffset/10, movingSpeedL + leftOffset), rangeMapper(distance, 0.08f, 0.5f, 70 + rightOffset / 10, movingSpeedR + rightOffset), robotName); // index 3: move forward
+                        robotControl.RobotMove(1, rangeMapper(distance, 0.1f, 0.5f, 60 + leftOffset/10, movingSpeedL + leftOffset), rangeMapper(distance, 0.1f, 0.5f, 60 + rightOffset / 10, movingSpeedR + rightOffset), robotName); // index 3: move forward
 
                         stateInfoBoard.transform.GetChild(i).gameObject.GetComponent<TextMeshPro>().text = "Moving Forward";
 

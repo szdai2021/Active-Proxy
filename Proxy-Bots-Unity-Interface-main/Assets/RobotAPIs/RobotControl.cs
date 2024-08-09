@@ -21,31 +21,6 @@ public class RobotControl : MonoBehaviour
     public GameObject colliderParent;
 
     public bool[] robotEnable;
-    public List<bool> robotStopped = new List<bool> { true, true, true, true, true, true };
-
-    private List<Vector3> robotPosPre = new List<Vector3> { Vector3.zero, Vector3.zero , Vector3.zero, Vector3.zero , Vector3.zero , Vector3.zero };
-    private bool delayFlag = false;
-    private List<bool> delayRobotStopped = new List<bool> { true, true, true, true, true, true };
-
-    private IEnumerator delayTimer()
-    {
-        while (true)
-        {
-            if (delayFlag)
-            {
-                yield return new WaitForSeconds(1f);
-                robotStopped = delayRobotStopped;
-                delayFlag = false;
-            }
-
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
-
-    private void Start()
-    {
-        StartCoroutine(delayTimer());
-    }
 
     void Update()
     {
@@ -91,16 +66,6 @@ public class RobotControl : MonoBehaviour
             {
                 Stop();
             }
-        }
-
-        for (int i = 0; i < 6; i++)
-        {
-            if (robotPosPre[i] != null & Vector3.Distance(robotPosPre[i], robotParent.transform.GetChild(i).position) > 0.01)
-            {
-                robotStopped[i] = false;
-            }
-
-            robotPosPre[i] = robotParent.transform.GetChild(i).position;
         }
     }
 
@@ -163,15 +128,8 @@ public class RobotControl : MonoBehaviour
             {
                 print("robot" + i + " is too close to the edge");
 
-                if (robotStopped[i-1])
-                {
-                    return;
-                }
-                else
-                {
-                    Stop(name);
-                    return;
-                }
+                Stop(name);
+                return;
             }
         }
 
@@ -182,9 +140,6 @@ public class RobotControl : MonoBehaviour
             message.AddValue(OSCValue.Int(spL));
             message.AddValue(OSCValue.Int(spR));
             transmitter.Send(message);
-
-            robotStopped[i-1] = false;
-            delayRobotStopped[i - 1] = false;
         }
     }
 
@@ -220,8 +175,5 @@ public class RobotControl : MonoBehaviour
         message.AddValue(OSCValue.Int(0));
         message.AddValue(OSCValue.Int(0));
         transmitter.Send(message);
-
-        delayFlag = true;
-        delayRobotStopped[i - 1] = true;
     }
 }
