@@ -7,8 +7,9 @@ public class informationSync : MonoBehaviour
 {
     public ConnectionManager cm;
 
-    public GameObject robotAgent;
-    public GameObject destinationParent;
+    public GameObject[] robotAgent;
+    public GameObject[] destinationParent;
+
     public GameObject referenceTopLeft;
     public GameObject referenceTopRight;
     public GameObject referenceBtmLeft;
@@ -33,7 +34,7 @@ public class informationSync : MonoBehaviour
                 // send robot position to sever
                 for (int i = 0; i < 6; i++)
                 {
-                    Transform t = robotAgent.transform.GetChild(i);
+                    Transform t = robotAgent[i].transform;
 
                     float orientation = Vector3.SignedAngle(t.GetChild(1).position - t.GetChild(0).position, Vector3.forward, Vector3.up);
                     float x = -t.position.x + referenceTopLeft.transform.position.x;
@@ -68,7 +69,7 @@ public class informationSync : MonoBehaviour
         // send robot position to sever
         for (int i = 0; i < 6; i++)
         {
-            Transform t = robotAgent.transform.GetChild(i);
+            Transform t = robotAgent[i].transform;
 
             float orientation = Vector3.SignedAngle(t.GetChild(1).position - t.GetChild(0).position, Vector3.forward, Vector3.down);
             float x = -t.position.x + referenceTopLeft.transform.position.x;
@@ -118,7 +119,7 @@ public class informationSync : MonoBehaviour
 
     private void updateDestination(int index)
     {
-        Transform t = destinationParent.transform.GetChild(index);
+        Transform t = destinationParent[index].transform;
         screenPositionHolder.transform.localPosition = new Vector3(referenceTopLeft.transform.localPosition.x - cm.posReceived[index].y * heightMax, screenPositionHolder.transform.localPosition.y, referenceTopLeft.transform.localPosition.z - cm.posReceived[index].x * widthMax);
         screenPositionHolder.transform.localPosition += offset;
         t.transform.position = screenPositionHolder.transform.position;

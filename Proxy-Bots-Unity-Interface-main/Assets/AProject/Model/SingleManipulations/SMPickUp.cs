@@ -7,6 +7,8 @@ using UnityEngine.Events;
 public class SMPickUp : SingleManipulation
 {
     public Transform zonePlane;
+    public GameObject cursorPrefab;
+    public GameObject cursorParent;
     private float pickUpThreshold = 0.05f;
     private static int bufferLength = 90;
     public bool onSurface = false;
@@ -17,17 +19,29 @@ public class SMPickUp : SingleManipulation
     public UnityEvent OnPlaced = new UnityEvent();
     public UnityEvent OnAirDwell = new UnityEvent();
 
+    private GameObject cursorPlaceHolder = null;
+
     private void Awake()
     {
         OnPickUp.AddListener(delegate
         {
-            target.gameObject.GetComponent<Renderer>().material.color = Color.red; 
+            target.gameObject.GetComponent<Renderer>().material.color = Color.red;
+            // create cursor
+            cursorPlaceHolder = Instantiate(cursorPrefab, cursorParent.transform);
+            cursorPlaceHolder.GetComponent<sendCursorPos>().name = this.transform.parent.name;
+            cursorPlaceHolder.GetComponent<sendCursorPos>().StartFlag = true;
+            cursorPlaceHolder.GetComponent<sendCursorPos>().posParent = this.transform.parent.gameObject;
             Debug.Log("Picked Up");
         });
 
         OnPlaced.AddListener(delegate
         {
             target.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+            // remove cursor
+            if (cursorPlaceHolder != null) {
+                cursorPlaceHolder.GetComponent<sendCursorPos>().StartFlag = false;
+                cursorPlaceHolder.Destroy();
+            }
             Debug.Log("Placed");
         });
 
@@ -40,7 +54,12 @@ public class SMPickUp : SingleManipulation
 
     private void Update()
     {
-        if(lastPositions.Count >= bufferLength)
+        if (cursorPlaceHolder != null)
+        {
+            cursorPlaceHolder.GetComponent<sendCursorPos>().distance = Vector3.Distance(this.transform.parent.position, cursorPlaceHolder.transform.position);
+        }
+
+        if (lastPositions.Count >= bufferLength)
         {
             lastPositions.Dequeue();
         }

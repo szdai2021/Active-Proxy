@@ -7,7 +7,7 @@ using System;
 
 public class executePath : MonoBehaviour
 {
-    public GameObject agentParent;
+    public GameObject[] agentParent;
     public GameObject[] agents;
     public GameObject[] destinations;
 
@@ -57,24 +57,27 @@ public class executePath : MonoBehaviour
                         // Add all corners of the path to the list
                         path.AddRange(navMeshAgent.path.corners);
                     }
-                    
+
                     // secondary stop when arriving destination
-                    if (destinations[i].transform.GetComponent<CapsuleCollider>().bounds.Contains(agentParent.transform.GetChild(i).transform.position))
+                    if (destinations[i].transform.GetComponent<CapsuleCollider>().bounds.Contains(agentParent[i].transform.position))
                     {
                         destinationFinished[i] = true;
                         rotationFinished[i] = true;
                     }
                     else
                     {
-                        if (Vector3.Distance(agents[i].transform.position, path[path.Count - 1]) > arrivingThreshold+0.01)
+                        if (navMeshAgent.hasPath)
                         {
-                            destinationFinished[i] = false;
+                            if (Vector3.Distance(agents[i].transform.position, path[path.Count - 1]) > arrivingThreshold + 0.01)
+                            {
+                                destinationFinished[i] = false;
+                            }
                         }
                     }
 
                     rotateRobotByPath(path, i);
 
-                     moveRobotByPath(path, i);
+                    moveRobotByPath(path, i);
 
                     if (destinationFinished[1])
                     {
@@ -178,7 +181,7 @@ public class executePath : MonoBehaviour
 
         if (plannedPath.Count > 1 & destinationFinished[i])
         {
-            Vector3 headingDirection = agentParent.transform.GetChild(i).transform.GetChild(1).position - agentParent.transform.GetChild(i).transform.GetChild(0).position;
+            Vector3 headingDirection = agentParent[i].transform.GetChild(1).position - agentParent[i].transform.GetChild(0).position;
             Vector3 turningDirection = plannedPath[1] - plannedPath[0];
 
             float turningAngle = Vector3.SignedAngle(headingDirection, turningDirection, Vector3.up);

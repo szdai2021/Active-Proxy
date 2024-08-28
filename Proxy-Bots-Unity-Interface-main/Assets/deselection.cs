@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class deselection : MonoBehaviour
 {
-    public GameObject agentParents;
+    public GameObject[] agentParents;
     public GameObject deselectionIndicator;
 
     private int counter;
@@ -13,8 +13,9 @@ public class deselection : MonoBehaviour
     {
         counter = 0;
 
-        foreach (Transform t in agentParents.transform)
+        foreach (GameObject g in agentParents)
         {
+            Transform t = g.transform;
             if (this.GetComponent<BoxCollider>().bounds.Contains(t.position))
             {
                 counter += 1;

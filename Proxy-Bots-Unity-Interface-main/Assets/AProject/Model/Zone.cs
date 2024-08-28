@@ -139,7 +139,7 @@ public class Zone : MonoBehaviour
                 {                    
                     float norm = milSec / dwellTimeMilSec;
                     onDwelling.Invoke(zoneId, t.Key.name, norm);
-                    Debug.Log(zoneId + "-" + norm);
+                    //Debug.Log(zoneId + "-" + norm);
                 }
             }
            

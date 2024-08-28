@@ -17,7 +17,7 @@ public class RobotControl : MonoBehaviour
     public List<int> speedLOffset = new List<int>(6);
     public List<int> speedROffset = new List<int>(6);
 
-    public GameObject robotParent;
+    public GameObject[] robotParent;
     public GameObject colliderParent;
 
     public bool[] robotEnable;
@@ -124,7 +124,7 @@ public class RobotControl : MonoBehaviour
 
         foreach(Transform t in colliderParent.transform)
         {
-            if (t.gameObject.GetComponent<BoxCollider>().bounds.Contains(robotParent.transform.GetChild(i-1).transform.position))
+            if (t.gameObject.GetComponent<BoxCollider>().bounds.Contains(robotParent[i-1].transform.position))
             {
                 print("robot" + i + " is too close to the edge");
 
