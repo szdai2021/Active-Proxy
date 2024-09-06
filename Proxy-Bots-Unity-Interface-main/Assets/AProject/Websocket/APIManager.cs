@@ -25,6 +25,10 @@ public class APIManager : MonoBehaviour
     public bool sendRollLeftEvent;
     public bool sendRollExitEvent;
 
+    public bool sendHoverEnterEvent;
+    public bool sendHoverExitEvent;
+    public bool sendBookMarkEvent;
+
     private const string ACTION_PICKUP = "pickup";
     private const string ACTION_PLACED = "placed";
     private const string ACTION_AIRDWELLED = "airdwelled";
@@ -39,6 +43,12 @@ public class APIManager : MonoBehaviour
     private const string ACTION_ROLL_RIGHT = "rollright";
     private const string ACTION_ROLL_LEFT = "rollleft";
     private const string ACTION_ROLL_EXIT = "rollexit";
+
+    private const string ACTION_HOVER_ENTER = "hoverenter";
+    private const string ACTION_HOVER_EXIT = "hoverexit";
+    private const string ACTION_BOOK_MARK = "bookmarkenter";
+
+
     private void Start()
     {
         if(connectOnStart) connectionManager.Connect();
@@ -99,7 +109,6 @@ public class APIManager : MonoBehaviour
         if (sendPitchExitEvent) connectionManager.Send(ACTION_PITCH_EXIT+ "-" + t.name);
     }
 
-
     public void SendRollRight(Transform t)
     {
         if (sendRollRightEvent) connectionManager.Send(ACTION_ROLL_RIGHT + "-" + t.name);
@@ -115,5 +124,19 @@ public class APIManager : MonoBehaviour
         if (sendRollExitEvent) connectionManager.Send(ACTION_ROLL_EXIT + "-" + t.name);
     }
 
+    public void SendHoverEnter(int id, string refName)
+    {
+        if (sendHoverEnterEvent) connectionManager.Send(ACTION_HOVER_ENTER + "-" + id + "-" + refName);
+    }
+
+    public void SendHoverExit(int id, string refName)
+    {
+        if (sendHoverExitEvent) connectionManager.Send(ACTION_HOVER_EXIT + "-" + id + "-" + refName);
+    }
+
+    public void SendBookMark(int id, string refName)
+    {
+        if (sendBookMarkEvent) connectionManager.Send(ACTION_BOOK_MARK + "-" + id + "-" + refName);
+    }
 
 }

@@ -31,8 +31,16 @@ public class Zone : MonoBehaviour
     private Dictionary<Transform, Stopwatch> dwellList = new Dictionary<Transform, Stopwatch>();
     private Dictionary<Transform, bool> confirmationZoneList = new Dictionary<Transform, bool>();
     private Dictionary<Transform, bool> dwelledList = new Dictionary<Transform, bool>();
+
+    private Dictionary<string, bool> prev_entered = new Dictionary<string, bool>();
+
     private void Start()
     {
+        foreach (Transform t in trackedObjects)
+        {
+            prev_entered[t.name] = false;
+        }
+
         mat = gameObject.GetComponent<Renderer>().material;
     }
     // Update is called once per frame
@@ -40,37 +48,95 @@ public class Zone : MonoBehaviour
     {
        // CheckDistance();
         CheckDwellList();
+
+        foreach (Transform t in trackedObjects)
+        {
+            if (!prev_entered[t.name])
+            {
+                if (this.GetComponent<BoxCollider>().bounds.Contains(t.position))
+                {
+                    // building has entered the zone
+
+                    if (t.CompareTag("proxy"))
+                    {
+                        if (!confirmationZoneList.ContainsKey(t))
+                        {
+                            confirmationZoneList.Add(t, false);
+                        }
+                        confirmationZoneList[t] = true;
+                        Debug.Log("Enter confirmation zone " + t.name);
+                        mat.color = Color.green;
+                        onEnter.Invoke(zoneId, t.name);
+                        AddToDwellList(t);
+                        dwellList[t].Restart();
+                    }
+
+                    prev_entered[t.name] = true;
+                }
+            }
+
+            if (prev_entered[t.name])
+            {
+                if (!this.transform.GetChild(0).GetComponent<BoxCollider>().bounds.Contains(t.position))
+                {
+                    // building has exited the zone
+
+                    if (t.CompareTag("proxy"))
+                    {
+                        if (!confirmationZoneList.ContainsKey(t))
+                        {
+                            confirmationZoneList.Add(t, false);
+                        }
+                        Debug.Log("Exit confirmation zone " + t.name);
+                        confirmationZoneList[t] = false;
+                        onExit.Invoke(zoneId, t.name);
+                        dwellList[t].Stop();
+                        dwelledList[t] = false;
+                    }
+
+                    prev_entered[t.name] = false;
+                }
+            }
+        }
     }
 
+    /*
     private void OnTriggerEnter(Collider other)
     {
         Transform t = other.transform;
-        if (!confirmationZoneList.ContainsKey(t))
+        if (t.CompareTag("proxy"))
         {
-            confirmationZoneList.Add(t, false);
+            if (!confirmationZoneList.ContainsKey(t))
+            {
+                confirmationZoneList.Add(t, false);
+            }
+            confirmationZoneList[t] = true;
+            Debug.Log("Enter confirmation zone " + t.name);
+            mat.color = Color.green;
+            onEnter.Invoke(zoneId, t.name);
+            AddToDwellList(t);
+            dwellList[t].Restart();
         }
-        confirmationZoneList[t] = true;
-        Debug.Log("Enter confirmation zone " + t.name);
-        mat.color = Color.green;
-        onEnter.Invoke(zoneId, t.name);
-        AddToDwellList(t);
-        dwellList[t].Restart();
+        
     }
 
     private void OnTriggerExit(Collider other)
     {
         Transform t = other.transform;
-        if (!confirmationZoneList.ContainsKey(t))
+        if (t.CompareTag("proxy"))
         {
-            confirmationZoneList.Add(t, false);
-
+            if (!confirmationZoneList.ContainsKey(t))
+            {
+                confirmationZoneList.Add(t, false);
+            }
+            Debug.Log("Exit confirmation zone " + t.name);
+            confirmationZoneList[t] = false;
+            onExit.Invoke(zoneId, t.name);
+            dwellList[t].Stop();
+            dwelledList[t] = false;
         }
-        Debug.Log("Exit confirmation zone " + t.name);
-        confirmationZoneList[t] = false;
-        onExit.Invoke(zoneId, t.name);
-        dwellList[t].Stop();
-        dwelledList[t] = false;
     }
+    */
 
     [Obsolete("CheckDistance is deprecated.")]
     private void CheckDistance()

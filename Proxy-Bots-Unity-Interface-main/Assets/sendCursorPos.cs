@@ -12,6 +12,7 @@ public class sendCursorPos : MonoBehaviour
     public GameObject referenceTopLeft;
     public GameObject referenceTopRight;
     public GameObject referenceBtmLeft;
+    public GameObject cursorPlaceholder;
 
     public string name;
     public float distance;
@@ -32,6 +33,7 @@ public class sendCursorPos : MonoBehaviour
         referenceTopLeft = this.transform.parent.Find("TopLeftReference").gameObject;
         referenceTopRight = this.transform.parent.Find("TopRightReference").gameObject;
         referenceBtmLeft = this.transform.parent.Find("BtmLeftReference").gameObject;
+        cursorPlaceholder = this.transform.parent.Find("Cursor PlaceHolder").gameObject;
 
         widthMax = Mathf.Abs(Vector3.Distance(referenceTopLeft.transform.localPosition, referenceTopRight.transform.localPosition));
         heightMax = Mathf.Abs(Vector3.Distance(referenceTopLeft.transform.localPosition, referenceBtmLeft.transform.localPosition));
@@ -40,9 +42,10 @@ public class sendCursorPos : MonoBehaviour
         websocketThread.Start();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        this.transform.position = new Vector3(this.transform.position.x, posParent.transform.position.y, posParent.transform.position.z);
+        cursorPlaceholder.transform.position = new Vector3(cursorPlaceholder.transform.position.x, posParent.transform.position.y, posParent.transform.position.z);
+        this.transform.localPosition = new Vector3(this.transform.localPosition.x, cursorPlaceholder.transform.localPosition.y, cursorPlaceholder.transform.localPosition.z);
 
         Transform t = this.transform;
 
@@ -64,7 +67,7 @@ public class sendCursorPos : MonoBehaviour
                 cm.Send(
                 "C" + "-" + name + "-" + ratioLimit(a)*100 + "-" + ratioLimit(b)*100 + "-" + distance);
             }
-            Thread.Sleep(200);
+            Thread.Sleep(100);
         }
     }
 
